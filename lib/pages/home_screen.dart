@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -6,18 +8,47 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Map<String, dynamic>> tasks = [
-    {"title": "Task 1", "isCompleted": false},
-    {"title": "Task 2", "isCompleted": false},
-  ];
-
+  var tasks = [];
   var taskController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    loadTasks();
+  }
+
+  @override
+  void dispose() {
+    taskController.dispose();
+    super.dispose();
+  }
+
+  void saveData() async {
+    var pref = await SharedPreferences.getInstance();
+
+    if (tasks.isNotEmpty) {
+      String savedData = json.encode(tasks);
+      pref.setString("tasks", savedData);
+    }
+  }
+
+  void loadTasks() async {
+    var pref = await SharedPreferences.getInstance();
+    String? tasksJson = pref.getString("tasks");
+
+    if (tasksJson != null) {
+      var decodedTasks = json.decode(tasksJson);
+      tasks =
+          decodedTasks.map((task) => Map<String, dynamic>.from(task)).toList();
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'My Tasks',
           style: TextStyle(
             fontSize: 22,
@@ -25,55 +56,83 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      body: Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Expanded(
-            flex: 9,
-            child: ListView(
-              children: tasks
-                  .map((task) => Card(
-                        shadowColor: Colors.white,
-                        child: ListTile(
-                          leading: Checkbox(
-                              value: task["isCompleted"],
-                              onChanged: (bool? value) {
-                                task["isCompleted"] = !task["isCompleted"];
-                                setState(() {
-                                  value = task["isCompleted"];
-                                });
-                              }),
-                          title: Text('${task["title"]}',
-                            style: TextStyle(
-                              decoration: task["isCompleted"]? TextDecoration.lineThrough:TextDecoration.none
-                            ),
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Expanded(
+              flex: 9,
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: 11),
+                children: tasks
+                    .map((task) => Container(
+                          margin: EdgeInsets.only(bottom: 11),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                colors: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? [
+                                        Color.fromARGB(255, 149, 74, 49),
+                                        Color.fromARGB(255, 16, 90, 174),
+                                        Color.fromARGB(210, 83, 97, 178)
+                                      ]
+                                    : [
+                                        Color.fromARGB(255, 202, 194, 192),
+                                        Color.fromARGB(255, 141, 174, 211),
+                                        Color.fromARGB(210, 169, 172, 195)
+                                      ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight),
+                            borderRadius: BorderRadius.circular(30),
                           ),
-                          trailing: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  tasks.remove(task);
-                                });
-                              },
-                              child: Icon(Icons.delete)),
-                        ),
-                      ))
-                  .toList(),
+                          child: ListTile(
+                            leading: Checkbox(
+                                value: task["isCompleted"],
+                                onChanged: (bool? value) {
+                                  task["isCompleted"] = !task["isCompleted"];
+                                  setState(() {
+                                    value = task["isCompleted"];
+                                  });
+                                }),
+                            title: Text(
+                              '${task["title"]}',
+                              style: TextStyle(
+                                  decoration: task["isCompleted"]
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none),
+                            ),
+                            trailing: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    tasks.remove(task);
+                                    saveData();
+                                  });
+                                },
+                                child: Icon(Icons.delete)),
+                          ),
+                        ))
+                    .toList(),
+              ),
             ),
-          ),
-          Card(
-            shadowColor: Colors.black,
-            child: Expanded(
-              flex: 1,
+            Container(
+              margin: EdgeInsets.all(11),
+              height: 60,
               child: TextField(
                 controller: taskController,
                 decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30)),
                     label: Text('New Task'),
                     suffix: InkWell(
                         onTap: () {
                           if (taskController != null) {
                             var newTask = taskController.text.toString();
-                            tasks.add({"title": newTask, "isCompleted": false});
+                            tasks.insert(
+                                0, {"title": newTask, "isCompleted": false});
                             setState(() {
+                              saveData();
                               taskController.clear();
                             });
                           }
@@ -83,9 +142,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           size: 30,
                         ))),
               ),
-            ),
-          )
-        ]),
+            )
+          ]),
+        ),
       ),
     );
   }
