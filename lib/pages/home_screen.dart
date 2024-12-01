@@ -62,7 +62,16 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Expanded(
               flex: 9,
-              child: ListView(
+              child: tasks.isEmpty? 
+                const Center(
+                  child: Text.rich(
+                    TextSpan(children: [
+                      TextSpan(text: 'Your\'re all caught up,\n',style: TextStyle(fontSize: 25,color: Colors.blueGrey)),
+                      TextSpan(text: 'Time to take a BREAK!',style: TextStyle(fontSize: 30,color: Colors.lightBlueAccent))
+                    ])
+                  ),
+                ) 
+              : ListView(
                 padding: EdgeInsets.symmetric(horizontal: 11),
                 children: tasks
                     .map((task) => Container(
@@ -71,12 +80,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             gradient: LinearGradient(
                                 colors: Theme.of(context).brightness ==
                                         Brightness.dark
-                                    ? [
+                                    ? const [
                                         Color.fromARGB(255, 149, 74, 49),
                                         Color.fromARGB(255, 16, 90, 174),
                                         Color.fromARGB(210, 83, 97, 178)
                                       ]
-                                    : [
+                                    : const [
                                         Color.fromARGB(255, 202, 194, 192),
                                         Color.fromARGB(255, 141, 174, 211),
                                         Color.fromARGB(210, 169, 172, 195)
@@ -136,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             });
                           }
                         },
-                        child: Icon(
+                        child: const Icon(
                           Icons.send,
                           size: 30,
                         ))),
