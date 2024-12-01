@@ -86,9 +86,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Color.fromARGB(210, 83, 97, 178)
                                       ]
                                     : const [
-                                        Color.fromARGB(255, 202, 194, 192),
-                                        Color.fromARGB(255, 141, 174, 211),
-                                        Color.fromARGB(210, 169, 172, 195)
+                                        Color.fromRGBO(252, 213, 205, 1),
+                                        Color.fromARGB(255, 207, 217, 229),
+                                        Color.fromARGB(210, 219, 220, 222)
                                       ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight),
