@@ -23,9 +23,26 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: Text(
-          'To Do List',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        child: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan( style: const TextStyle(fontSize: 25, color: Colors.blueGrey),
+                text: 'To'
+              ),
+              TextSpan(
+                text: 'Do ',
+                style: TextStyle(
+                  fontSize: 30,color: Colors.lightBlueAccent
+                )
+              ),
+              TextSpan( style: TextStyle(
+                  fontSize: 25,
+                  color: Colors.blueGrey
+                ),
+                text: 'List'
+              ),
+            ]
+          ),
         ),
       ),
     );
