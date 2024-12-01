@@ -26,10 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void saveData() async {
     var pref = await SharedPreferences.getInstance();
 
-    if (tasks.isNotEmpty) {
-      String savedData = json.encode(tasks);
-      pref.setString("tasks", savedData);
-    }
+    String savedData = json.encode(tasks);
+    pref.setString("tasks", savedData);
   }
 
   void loadTasks() async {
@@ -94,6 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   task["isCompleted"] = !task["isCompleted"];
                                   setState(() {
                                     value = task["isCompleted"];
+                                    saveData();
                                   });
                                 }),
                             title: Text(
@@ -127,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     label: Text('New Task'),
                     suffix: InkWell(
                         onTap: () {
-                          if (taskController != null) {
+                          if (taskController.text.isNotEmpty) {
                             var newTask = taskController.text.toString();
                             tasks.insert(
                                 0, {"title": newTask, "isCompleted": false});
